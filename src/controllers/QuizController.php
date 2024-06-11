@@ -19,8 +19,8 @@ class QuizController {
     }
 
     public function getAllQuizzes() {
-        $result = $this->conn->query("SELECT * FROM quiz");
-        return $result->fetch_all(MYSQLI_ASSOC);
+        $stmt = $this->conn->query("SELECT * FROM quiz");
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public function getQuizById($quizId) {

@@ -6,7 +6,7 @@ require_once '../src/controllers/QuizController.php';
 
 $db = (new Database())->getConnection();
 $quizController = new QuizController($db);
-$quizzes = $quizController->listQuizzes();
+$quizzes = $quizController->getAllQuizzes();
 ?>
 
 <!DOCTYPE html>
