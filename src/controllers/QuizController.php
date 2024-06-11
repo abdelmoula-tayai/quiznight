@@ -1,8 +1,4 @@
 <?php
-require_once '../models/Quiz.php';
-require_once '../models/Question.php';
-require_once '../models/Answer.php';
-
 class QuizController {
     private $conn;
 
@@ -10,48 +6,28 @@ class QuizController {
         $this->conn = $db;
     }
 
-    public function createQuiz($title, $description, $user_id) {
-        $quiz = new Quiz($this->conn);
-        $quiz->title = $title;
-        $quiz->description = $description;
-        $quiz->user_id = $user_id;
-
-        return $quiz->create();
-    }
-
-    public function listQuizzes() {
-        $quiz = new Quiz($this->conn);
-        return $quiz->listQuizzes();
-    }
-
-    public function addQuestion($quiz_id, $text) {
-        $question = new Question($this->conn);
-        $question->quiz_id = $quiz_id;
-        $question->text = $text;
-
-        return $question->create();
-    }
-
-    public function addAnswer($question_id, $text, $is_correct) {
-        $answer = new Answer($this->conn);
-        $answer->question_id = $question_id;
-        $answer->text = $text;
-        $answer->is_correct = $is_correct;
-
-        return $answer->create();
-    }
-
-    public function getQuiz($quiz_id) {
-        $quiz = new Quiz($this->conn);
-        $questions = (new Question($this->conn))->getQuestionsByQuizId($quiz_id);
-        $quiz_data = ['quiz' => $quiz->getQuiz($quiz_id), 'questions' => []];
+    public function createQuiz($title, $description) {
+        $stmt = $this->conn->prepare("INSERT INTO quiz (title, description) VALUES (:title, :description)");
+        $stmt->bindParam(':title', $title);
+        $stmt->bindParam(':description', $description);
         
-        foreach ($questions as $question) {
-            $answers = (new Answer($this->conn))->getAnswersByQuestionId($question['id']);
-            $quiz_data['questions'][] = ['question' => $question, 'answers' => $answers];
+        if ($stmt->execute()) {
+            return $this->conn->lastInsertId(); // Return the new quiz ID
+        } else {
+            return false;
         }
+    }
 
-        return $quiz_data;
+    public function getAllQuizzes() {
+        $result = $this->conn->query("SELECT * FROM quiz");
+        return $result->fetch_all(MYSQLI_ASSOC);
+    }
+
+    public function getQuizById($quizId) {
+        $stmt = $this->conn->prepare("SELECT * FROM quiz WHERE id = ?");
+        $stmt->bind_param("i", $quizId);
+        $stmt->execute();
+        return $stmt->get_result()->fetch_assoc();
     }
 }
 ?>

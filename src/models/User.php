@@ -1,7 +1,7 @@
 <?php
 class User {
     private $conn;
-    private $table = 'user';
+    private $table_name = "user";
 
     public $id;
     public $username;
@@ -13,33 +13,27 @@ class User {
     }
 
     public function create() {
-        $query = "INSERT INTO " . $this->table . " (username, password, email) VALUES (:username, :password, :email)";
+        $query = "INSERT INTO " . $this->table_name . " (username, password, email) VALUES (:username, :password, :email)";
         $stmt = $this->conn->prepare($query);
-
-        $this->username = htmlspecialchars(strip_tags($this->username));
-        $this->password = password_hash($this->password, PASSWORD_BCRYPT);
-        $this->email = htmlspecialchars(strip_tags($this->email));
 
         $stmt->bindParam(':username', $this->username);
         $stmt->bindParam(':password', $this->password);
         $stmt->bindParam(':email', $this->email);
 
-        return $stmt->execute();
+        if ($stmt->execute()) {
+            return true;
+        }
+
+        return false;
     }
 
-    public function authenticate($username, $password) {
-        $query = "SELECT * FROM " . $this->table . " WHERE username = :username";
+    public function findByUsername($username) {
+        $query = "SELECT * FROM " . $this->table_name . " WHERE username = :username";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':username', $username);
         $stmt->execute();
 
-        if($stmt->rowCount() == 1) {
-            $row = $stmt->fetch(PDO::FETCH_ASSOC);
-            if(password_verify($password, $row['password'])) {
-                return $row;
-            }
-        }
-        return false;
+        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 }
 ?>
