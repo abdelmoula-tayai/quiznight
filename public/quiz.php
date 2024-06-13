@@ -1,62 +1,52 @@
 <?php
-class Quiz {
-    private $conn;
-    private $table_name = "quiz";
+session_start();
+$root = dirname(__DIR__);
+require_once $root . '/src/utils/db.php';
+require_once $root . '/src/controllers/QuizController.php';
+require_once $root . '/src/controllers/QuestionController.php';
+require_once $root . '/src/controllers/AnswerController.php';
 
-    public $id;
-    public $title;
-    public $description;
-    public $user_id;
+$db = (new Database())->getConnection();
+$quizController = new QuizController($db);
+$questionController = new QuestionController($db);
+$answerController = new AnswerController($db);
 
-    public function __construct($db) {
-        $this->conn = $db;
-    }
-
-    public function create() {
-        $query = "INSERT INTO " . $this->table_name . " (title, description, user_id) VALUES (:title, :description, :user_id)";
-        $stmt = $this->conn->prepare($query);
-
-        $stmt->bindParam(':title', $this->title);
-        $stmt->bindParam(':description', $this->description);
-        $stmt->bindParam(':user_id', $this->user_id);
-
-        if ($stmt->execute()) {
-            return true;
-        }
-
-        return false;
-    }
-
-    public function listQuizzes() {
-        $query = "SELECT * FROM " . $this->table_name;
-        $stmt = $this->conn->prepare($query);
-        $stmt->execute();
-
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-
-    public function getQuiz($quiz_id) {
-        $query = "SELECT * FROM " . $this->table_name . " WHERE id = :id";
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(':id', $quiz_id);
-        $stmt->execute();
-
-        return $stmt->fetch(PDO::FETCH_ASSOC);
-    }
-
-    public function update() {
-        $query = "UPDATE " . $this->table_name . " SET title = :title, description = :description WHERE id = :id";
-        $stmt = $this->conn->prepare($query);
-
-        $stmt->bindParam(':title', $this->title);
-        $stmt->bindParam(':description', $this->description);
-        $stmt->bindParam(':id', $this->id);
-
-        if ($stmt->execute()) {
-            return true;
-        }
-
-        return false;
-    }
+if (!isset($_GET['id'])) {
+    header("Location: index.php");
+    exit();
 }
+
+$quizId = $_GET['id'];
+$quiz = $quizController->getQuizById($quizId);
+$questions = $questionController->getQuestionsByQuizId($quizId);
 ?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title><?php echo htmlspecialchars($quiz['title']); ?></title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <h1><?php echo htmlspecialchars($quiz['title']); ?></h1>
+    <p><?php echo htmlspecialchars($quiz['description']); ?></p>
+
+    <?php foreach ($questions as $question): ?>
+        <div class="question">
+            <h2><?php echo htmlspecialchars($question['content']); ?></h2>
+            <?php
+                $answers = $answerController->getAnswersByQuestionId($question['id']);
+                foreach ($answers as $answer):
+            ?>
+                <div class="answer">
+                    <input type="radio" name="question_<?php echo $question['id']; ?>" value="<?php echo $answer['id']; ?>">
+                    <?php echo htmlspecialchars($answer['content']); ?>
+                </div>
+            <?php endforeach; ?>
+        </div>
+    <?php endforeach; ?>
+
+    <a href="index.php">Back to Quiz List</a>
+</body>
+</html>

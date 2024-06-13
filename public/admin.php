@@ -15,7 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $quizController->createQuiz($_POST['title'], $_POST['description'], $_SESSION['user']['id']);
 }
 
-$quizzes = $quizController->listQuizzes();
+$quizzes = $quizController->getAllQuizzesByUserId($_SESSION['user']['id']);
 ?>
 
 <!DOCTYPE html>
@@ -34,10 +34,13 @@ $quizzes = $quizController->listQuizzes();
         <textarea id="description" name="description" required></textarea>
         <button type="submit">Create Quiz</button>
     </form>
-    <h2>Existing Quizzes</h2>
+    <h2>Your Quizzes</h2>
     <ul>
         <?php foreach ($quizzes as $quiz): ?>
-            <li><?php echo htmlspecialchars($quiz['title']); ?></li>
+            <li>
+                <?php echo htmlspecialchars($quiz['title']); ?>
+                <a href="editQuiz.php?id=<?php echo $quiz['id']; ?>">Edit</a>
+            </li>
         <?php endforeach; ?>
     </ul>
 </body>
