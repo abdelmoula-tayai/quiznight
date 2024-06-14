@@ -17,18 +17,15 @@ $quizzes = $quizController->getAllQuizzes();
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
 <body class="bg-gray-100">
-    <header class="bg-blue-500 text-white p-4">
+    <header class="bg-blue-500 text-white p-4 flex justify-between items-center">
         <h1 class="text-2xl">QuizNight</h1>
         <?php if (isset($_SESSION['user'])): ?>
-            <nav>
-                <a href="admin.php" class="text-white underline">Admin</a>
-            </nav>
+            <a href="admin.php" class="bg-white text-blue-500 rounded p-2">Admin Panel</a>
         <?php endif; ?>
     </header>
     <main class="p-4">
         <?php if (isset($_SESSION['user'])): ?>
             <p>Welcome, <?php echo htmlspecialchars($_SESSION['user']['username']); ?>! <a href="logout.php" class="text-blue-500 underline">Logout</a></p>
-            <p><a href="createQuiz.php" class="text-blue-500 underline">Create a New Quiz</a></p>
         <?php else: ?>
             <p><a href="login.php" class="text-blue-500 underline">Login</a> or <a href="register.php" class="text-blue-500 underline">Register</a> to create a quiz.</p>
         <?php endif; ?>
