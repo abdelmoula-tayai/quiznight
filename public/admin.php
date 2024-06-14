@@ -23,25 +23,33 @@ $quizzes = $quizController->getAllQuizzesByUserId($_SESSION['user']['id']);
 <head>
     <meta charset="UTF-8">
     <title>Admin</title>
-    <link rel="stylesheet" href="css/styles.css">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
-<body>
-    <h1>Admin Panel</h1>
-    <form method="POST" action="">
-        <label for="title">Quiz Title:</label>
-        <input type="text" id="title" name="title" required>
-        <label for="description">Quiz Description:</label>
-        <textarea id="description" name="description" required></textarea>
-        <button type="submit">Create Quiz</button>
-    </form>
-    <h2>Your Quizzes</h2>
-    <ul>
-        <?php foreach ($quizzes as $quiz): ?>
-            <li>
-                <?php echo htmlspecialchars($quiz['title']); ?>
-                <a href="editQuiz.php?id=<?php echo $quiz['id']; ?>">Edit</a>
-            </li>
-        <?php endforeach; ?>
-    </ul>
+<body class="bg-gray-100">
+    <header class="bg-blue-500 text-white p-4">
+        <h1 class="text-2xl">Admin Panel</h1>
+    </header>
+    <main class="p-4">
+        <form method="POST" action="" class="bg-white shadow rounded p-4 mb-4">
+            <div class="mb-4">
+                <label for="title" class="block text-sm mb-2">Quiz Title:</label>
+                <input type="text" id="title" name="title" required class="block w-full p-2 border rounded">
+            </div>
+            <div class="mb-4">
+                <label for="description" class="block text-sm mb-2">Quiz Description:</label>
+                <textarea id="description" name="description" required class="block w-full p-2 border rounded"></textarea>
+            </div>
+            <button type="submit" class="bg-blue-500 text-white rounded p-2">Create Quiz</button>
+        </form>
+        <h2 class="text-xl mb-4">Your Quizzes</h2>
+        <ul>
+            <?php foreach ($quizzes as $quiz): ?>
+                <li class="mb-2">
+                    <?php echo htmlspecialchars($quiz['title']); ?>
+                    <a href="editQuiz.php?id=<?php echo $quiz['id']; ?>" class="text-blue-500 underline">Edit</a>
+                </li>
+            <?php endforeach; ?>
+        </ul>
+    </main>
 </body>
 </html>
