@@ -31,6 +31,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 
     $quizController->updateQuiz($quiz_id, $quiz_title, $quiz_description, $questions);
+    header("Location: admin.php");
+    exit;
 }
 
 $quiz_id = isset($_GET['id']) ? $_GET['id'] : null;
@@ -62,75 +64,83 @@ if (!isset($quiz['questions']) || !is_array($quiz['questions'])) {
 <head>
     <meta charset="UTF-8">
     <title>Edit Quiz</title>
-    <link rel="stylesheet" href="css/styles.css">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
-<body>
-    <form method="post" action="editQuiz.php" enctype="multipart/form-data">
-        <input type="hidden" name="quiz_id" value="<?php echo htmlspecialchars($quiz_id); ?>">
+<body class="bg-gray-100">
+    <header class="bg-blue-500 text-white p-4">
+        <h1 class="text-2xl">Edit Quiz</h1>
+    </header>
+    <main class="p-4">
+        <form method="post" action="editQuiz.php" enctype="multipart/form-data" class="bg-white shadow rounded p-4">
+            <input type="hidden" name="quiz_id" value="<?php echo htmlspecialchars($quiz_id); ?>">
 
-        <label for="title">Quiz Title:</label>
-        <input type="text" id="title" name="title" value="<?php echo htmlspecialchars($quiz['title']); ?>" required>
+            <div class="mb-4">
+                <label for="title" class="block text-sm mb-2">Quiz Title:</label>
+                <input type="text" id="title" name="title" value="<?php echo htmlspecialchars($quiz['title']); ?>" required class="block w-full p-2 border rounded">
+            </div>
 
-        <label for="description">Quiz Description:</label>
-        <textarea id="description" name="description" required><?php echo htmlspecialchars($quiz['description']); ?></textarea>
+            <div class="mb-4">
+                <label for="description" class="block text-sm mb-2">Quiz Description:</label>
+                <textarea id="description" name="description" required class="block w-full p-2 border rounded"><?php echo htmlspecialchars($quiz['description']); ?></textarea>
+            </div>
 
-        <div id="questions">
-            <?php foreach ($quiz['questions'] as $index => $question): ?>
-                <div>
-                    <input type="hidden" name="questions[<?php echo $index; ?>][id]" value="<?php echo htmlspecialchars($question['id']); ?>">
-                    <h2>Question <?php echo $index + 1; ?></h2>
-                    <label>Question:</label>
-                    <input type="text" name="questions[<?php echo $index; ?>][content]" value="<?php echo htmlspecialchars($question['content']); ?>" required>
-                    <h3>Answers</h3>
-                    <div class="answers">
-                        <?php foreach ($question['answers'] as $answerIndex => $answer): ?>
-                            <div class="answer">
-                                <input type="hidden" name="questions[<?php echo $index; ?>][answers][<?php echo $answerIndex; ?>][id]" value="<?php echo htmlspecialchars($answer['id']); ?>">
-                                <input type="text" name="questions[<?php echo $index; ?>][answers][<?php echo $answerIndex; ?>][content]" value="<?php echo htmlspecialchars($answer['content']); ?>" required>
-                                <label>Correct?</label>
-                                <input type="checkbox" name="questions[<?php echo $index; ?>][answers][<?php echo $answerIndex; ?>][is_correct]" <?php echo $answer['is_correct'] ? 'checked' : ''; ?>>
-                            </div>
-                        <?php endforeach; ?>
+            <div id="questions">
+                <?php foreach ($quiz['questions'] as $index => $question): ?>
+                    <div class="mb-4">
+                        <input type="hidden" name="questions[<?php echo $index; ?>][id]" value="<?php echo htmlspecialchars($question['id']); ?>">
+                        <h2 class="text-lg mb-2">Question <?php echo $index + 1; ?></h2>
+                        <label class="block text-sm mb-2">Question:</label>
+                        <input type="text" name="questions[<?php echo $index; ?>][content]" value="<?php echo htmlspecialchars($question['content']); ?>" required class="block w-full p-2 border rounded">
+                        <h3 class="text-md mb-2">Answers</h3>
+                        <div class="answers">
+                            <?php foreach ($question['answers'] as $answerIndex => $answer): ?>
+                                <div class="answer mb-2">
+                                    <input type="hidden" name="questions[<?php echo $index; ?>][answers][<?php echo $answerIndex; ?>][id]" value="<?php echo htmlspecialchars($answer['id']); ?>">
+                                    <input type="text" name="questions[<?php echo $index; ?>][answers][<?php echo $answerIndex; ?>][content]" value="<?php echo htmlspecialchars($answer['content']); ?>" required class="block w-full p-2 border rounded">
+                                    <label class="inline-block text-sm mb-2">Correct?</label>
+                                    <input type="checkbox" name="questions[<?php echo $index; ?>][answers][<?php echo $answerIndex; ?>][is_correct]" <?php echo $answer['is_correct'] ? 'checked' : ''; ?> class="inline-block ml-2">
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                        <button type="button" onclick="addAnswer(this, <?php echo $index; ?>)" class="bg-blue-500 text-white rounded p-2">Add Answer</button>
                     </div>
-                    <button type="button" onclick="addAnswer(this, <?php echo $index; ?>)">Add Answer</button>
-                </div>
-            <?php endforeach; ?>
-        </div>
+                <?php endforeach; ?>
+            </div>
 
-        <button type="button" onclick="addQuestion()">Add Question</button>
-        <input type="submit" value="Update Quiz">
-    </form>
-
+            <button type="button" onclick="addQuestion()" class="bg-blue-500 text-white rounded p-2 mb-4">Add Question</button>
+            <input type="submit" value="Update Quiz" class="bg-blue-500 text-white rounded p-2">
+        </form>
+    </main>
     <script>
         let questionIndex = <?php echo count($quiz['questions']); ?>;
-
+        
         function addQuestion() {
             const questionsDiv = document.getElementById('questions');
             const questionDiv = document.createElement('div');
             questionDiv.innerHTML = `
-                <h2>Question ${questionIndex + 1}</h2>
-                <label>Question:</label>
-                <input type="text" name="questions[${questionIndex}][content]" required>
-                <h3>Answers</h3>
-                <div class="answer">
-                    <input type="text" name="questions[${questionIndex}][answers][0][content]" required>
-                    <label>Correct?</label>
-                    <input type="checkbox" name="questions[${questionIndex}][answers][0][is_correct]">
+                <h2 class="text-lg mb-2">Question ${questionIndex + 1}</h2>
+                <label class="block text-sm mb-2">Question:</label>
+                <input type="text" name="questions[${questionIndex}][content]" required class="block w-full p-2 border rounded">
+                <h3 class="text-md mb-2">Answers</h3>
+                <div class="answer mb-2">
+                    <input type="text" name="questions[${questionIndex}][answers][0][content]" required class="block w-full p-2 border rounded">
+                    <label class="inline-block text-sm mb-2">Correct?</label>
+                    <input type="checkbox" name="questions[${questionIndex}][answers][0][is_correct]" class="inline-block ml-2">
                 </div>
-                <button type="button" onclick="addAnswer(this, ${questionIndex})">Add Answer</button>
+                <button type="button" onclick="addAnswer(this, ${questionIndex})" class="bg-blue-500 text-white rounded p-2">Add Answer</button>
             `;
             questionsDiv.appendChild(questionDiv);
             questionIndex++;
         }
-
+        
         function addAnswer(button, questionIndex) {
             const answerDiv = document.createElement('div');
-            answerDiv.className = 'answer';
+            answerDiv.className = 'answer mb-2';
             const answerIndex = button.parentNode.querySelectorAll('.answer').length;
             answerDiv.innerHTML = `
-                <input type="text" name="questions[${questionIndex}][answers][${answerIndex}][content]" required>
-                <label>Correct?</label>
-                <input type="checkbox" name="questions[${questionIndex}][answers][${answerIndex}][is_correct]">
+                <input type="text" name="questions[${questionIndex}][answers][${answerIndex}][content]" required class="block w-full p-2 border rounded">
+                <label class="inline-block text-sm mb-2">Correct?</label>
+                <input type="checkbox" name="questions[${questionIndex}][answers][${answerIndex}][is_correct]" class="inline-block ml-2">
             `;
             button.parentNode.insertBefore(answerDiv, button);
         }
