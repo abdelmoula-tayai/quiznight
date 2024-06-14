@@ -26,8 +26,9 @@ $quizzes = $quizController->getAllQuizzesByUserId($_SESSION['user']['id']);
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
 <body class="bg-gray-100">
-    <header class="bg-blue-500 text-white p-4">
+    <header class="bg-blue-500 text-white p-4 flex justify-between items-center">
         <h1 class="text-2xl">Admin Panel</h1>
+        <a href="index.php" class="bg-white text-blue-500 rounded p-2">Home</a>
     </header>
     <main class="p-4">
         <form method="POST" action="" class="bg-white shadow rounded p-4 mb-4">
